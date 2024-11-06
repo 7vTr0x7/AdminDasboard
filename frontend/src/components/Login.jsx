@@ -1,44 +1,78 @@
-import React, { useState } from 'react';
-import { auth } from '../firebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from "react";
+import { auth } from "../firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert('Login successful!');
+      navigate("/"); // Use navigate instead of history.push
     } catch (error) {
-      console.error(error.message);
-      alert(error.message);
+      setError("Invalid email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="mb-4 text-2xl font-semibold">Login</h1>
-      <form className="flex flex-col space-y-4" onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Email"
-          className="px-4 py-2 border border-gray-300 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="px-4 py-2 border border-gray-300 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit" className="px-4 py-2 text-white bg-blue-500 rounded">
-          Login
-        </button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center text-gray-800">
+          Login to Your Account
+        </h2>
+
+        {error && <p className="text-center text-red-600">{error}</p>}
+
+        <form onSubmit={handleLogin} className="space-y-4 w-full">
+          <input
+            type="email"
+            placeholder="Email"
+            className="input-field w-full"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="input-field w-full"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button
+            type="submit"
+            className={`button w-full ${
+              loading ? "bg-gray-400 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <div className="flex justify-between text-sm text-gray-600">
+          <Link to="/forgot-password" className="hover:underline">
+            Forgot Password?
+          </Link>
+          <span>
+            Don't have an account?{" "}
+            <Link to="/register" className="text-blue-500 hover:underline">
+              Sign Up
+            </Link>
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
