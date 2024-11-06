@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../firebaseConfig";
 import { confirmPasswordReset } from "firebase/auth";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaRegEyeSlash } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa6";
 import toast from "react-hot-toast";
@@ -14,6 +14,8 @@ function ResetPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [searchParams] = useSearchParams();
   const oobCode = searchParams.get("oobCode");
+
+  const navigate = useNavigate();
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
@@ -35,6 +37,7 @@ function ResetPassword() {
       toast.success(
         "Password reset successfully. You can now log in with your new password."
       );
+      navigate("/login");
     } catch (error) {
       toast.error(
         "Failed to reset password. Please try again or request a new link."
